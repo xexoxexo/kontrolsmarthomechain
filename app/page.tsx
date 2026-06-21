@@ -1,82 +1,63 @@
 "use client";
-import { useEffect } from "react";
-import Image from "next/image";
+import { useRouter } from 'next/navigation';
 import { Wallet } from "@coinbase/onchainkit/wallet";
-import { useMiniKit } from "@coinbase/onchainkit/minikit";
-// import { useQuickAuth } from "@coinbase/onchainkit/minikit";
+import { useAccount } from "wagmi";
 import styles from "./page.module.css";
 
+const Logo = ({ size = 32 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M20 0C8.954 0 0 8.954 0 20C0 31.046 8.954 40 20 40C31.046 40 40 31.046 40 20C40 8.954 31.046 0 20 0Z" fill="#E8F1FA" />
+    <path d="M15 12C15 12 10 16 10 22C10 25.314 12.686 28 16 28C19.314 28 22 25.314 22 22C22 16 15 12 15 12Z" fill="#3B82F6" />
+    <path d="M26 18C26 18 23 20 23 24C23 26.209 24.791 28 27 28C29.209 28 31 26.209 31 24C31 20 26 18 26 18Z" fill="#3B82F6" />
+  </svg>
+);
+
 export default function Home() {
-  // If you need to verify the user's identity, you can use the useQuickAuth hook.
-  // This hook will verify the user's signature and return the user's FID. You can update
-  // this to meet your needs. See the /app/api/auth/route.ts file for more details.
-  // Note: If you don't need to verify the user's identity, you can get their FID and other user data
-  // via `useMiniKit().context?.user`.
-  // const { data, isLoading, error } = useQuickAuth<{
-  //   userFid: string;
-  // }>("/api/auth");
+  const { isConnected } = useAccount();
+  const router = useRouter();
 
-  const { setMiniAppReady, isMiniAppReady } = useMiniKit();
-
-  useEffect(() => {
-    if (!isMiniAppReady) {
-      setMiniAppReady();
+  const handleEnter = () => {
+    if (isConnected) {
+      router.push('/iot');
+    } else {
+      alert("Silahkan klik 'Connect Wallet' di kanan atas terlebih dahulu untuk masuk!");
     }
-  }, [setMiniAppReady, isMiniAppReady]);
+  };
 
   return (
     <div className={styles.container}>
-      <header className={styles.headerWrapper}>
-        <Wallet />
+      <header className={styles.header}>
+        <div className={styles.logoContainer}>
+          <Logo />
+        </div>
+        <div className={styles.walletContainer}>
+          <Wallet />
+        </div>
       </header>
 
-      <div className={styles.content}>
-        <Image
-          priority
-          src="/sphere.svg"
-          alt="Sphere"
-          width={200}
-          height={200}
-        />
-        <h1 className={styles.title}>MiniKit</h1>
+      <main className={styles.main}>
+        <div className={styles.centerIcon}>
+          <Logo size={48} />
+        </div>
 
-        <p>
-          Get started by editing <code>app/page.tsx</code>
+        <h1 className={styles.title}>
+          Kendalikan <strong>Smart Home</strong> Anda dengan Kekuatan AI
+        </h1>
+
+        <p className={styles.subtitle}>
+          Sistem IoT interaktif berbasis Gemini AI. Nyalakan dan matikan lampu rumah Anda dari mana saja dengan kendali suara pintar dan keamanan blockchain.
         </p>
 
-        <h2 className={styles.componentsTitle}>Explore Components</h2>
-
-        <ul className={styles.components}>
-          {[
-            {
-              name: "Transaction",
-              url: "https://docs.base.org/onchainkit/transaction/transaction",
-            },
-            {
-              name: "Swap",
-              url: "https://docs.base.org/onchainkit/swap/swap",
-            },
-            {
-              name: "Checkout",
-              url: "https://docs.base.org/onchainkit/checkout/checkout",
-            },
-            {
-              name: "Wallet",
-              url: "https://docs.base.org/onchainkit/wallet/wallet",
-            },
-            {
-              name: "Identity",
-              url: "https://docs.base.org/onchainkit/identity/identity",
-            },
-          ].map((component) => (
-            <li key={component.name}>
-              <a target="_blank" rel="noreferrer" href={component.url}>
-                {component.name}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </div>
+        <div className={styles.actions}>
+          <button
+            onClick={handleEnter}
+            className={styles.primaryButton}
+            style={{ opacity: isConnected ? 1 : 0.6 }}
+          >
+            Masuk
+          </button>
+        </div>
+      </main>
     </div>
   );
 }
