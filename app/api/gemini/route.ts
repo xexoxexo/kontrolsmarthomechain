@@ -28,9 +28,11 @@ export async function POST(req: Request) {
     });
 
     // normalize possible response shapes from the SDK
-    const text = (response as any).text ?? (response as any).outputText ??
-      (response as any).candidates?.[0]?.content ??
-      (response as any).candidates?.[0]?.output ?? JSON.stringify(response);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const responseAny = response as any;
+    const text = responseAny.text ?? responseAny.outputText ??
+      responseAny.candidates?.[0]?.content ??
+      responseAny.candidates?.[0]?.output ?? JSON.stringify(response);
 
     return NextResponse.json({ text });
   } catch (error) {

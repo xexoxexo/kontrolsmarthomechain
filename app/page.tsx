@@ -1,6 +1,8 @@
 "use client";
+import { useEffect } from "react";
 import { useRouter } from 'next/navigation';
-import { Wallet } from "@coinbase/onchainkit/wallet";
+import { Wallet, ConnectWallet, WalletDropdown, WalletDropdownDisconnect } from "@coinbase/onchainkit/wallet";
+import { Address, Avatar, Name, Identity } from "@coinbase/onchainkit/identity";
 import { useAccount } from "wagmi";
 import styles from "./page.module.css";
 
@@ -15,6 +17,12 @@ const Logo = ({ size = 32 }: { size?: number }) => (
 export default function Home() {
   const { isConnected } = useAccount();
   const router = useRouter();
+
+  useEffect(() => {
+    if (isConnected) {
+      router.push('/iot');
+    }
+  }, [isConnected, router]);
 
   const handleEnter = () => {
     if (isConnected) {
@@ -31,7 +39,20 @@ export default function Home() {
           <Logo />
         </div>
         <div className={styles.walletContainer}>
-          <Wallet />
+          <Wallet>
+            <ConnectWallet>
+              <Avatar className="h-6 w-6" />
+              <Name />
+            </ConnectWallet>
+            <WalletDropdown>
+              <Identity className="px-4 pt-3 pb-2" hasCopyAddressOnClick>
+                <Avatar />
+                <Name />
+                <Address />
+              </Identity>
+              <WalletDropdownDisconnect />
+            </WalletDropdown>
+          </Wallet>
         </div>
       </header>
 

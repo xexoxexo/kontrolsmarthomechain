@@ -35,7 +35,7 @@ export const minikitConfig = {
     heroImageUrl: `${ROOT_URL}/hero.png`,
     tagline: "Miniapp",
     ogTitle: "MiniApp",
-    ogDescription: "Daviss",
+    ogDescription: "izaki",
     ogImageUrl: `${ROOT_URL}/hero.png`,
   },
 } as const;

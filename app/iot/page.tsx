@@ -1,17 +1,28 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useAccount } from "wagmi";
+import { useRouter } from "next/navigation";
 import styles from "./iot.module.css";
 
 export default function IoTControl() {
+  const { isConnected, isConnecting } = useAccount();
+  const router = useRouter();
+
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<{ role: "user" | "ai"; text: string }[]>([]);
   const [loading, setLoading] = useState(false);
   const [iotStatus, setIotStatus] = useState<"OFF" | "ON">("OFF");
 
+  useEffect(() => {
+    if (!isConnecting && !isConnected) {
+      router.push("/");
+    }
+  }, [isConnected, isConnecting, router]);
+
   const playBeep = () => {
     try {
-      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const audioCtx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
       const oscillator = audioCtx.createOscillator();
       const gainNode = audioCtx.createGain();
       
@@ -84,6 +95,15 @@ export default function IoTControl() {
     }
   };
 
+  if (isConnecting || !isConnected) {
+    return (
+      <div className={styles.container} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', flexDirection: 'column', gap: '1rem', color: '#fff', backgroundColor: '#090d16' }}>
+        <p style={{ fontSize: '1.2rem', fontWeight: '500' }}>Menghubungkan ke Wallet...</p>
+        <p style={{ fontSize: '0.9rem', color: '#64748b' }}>Harap tunggu sebentar.</p>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.container}>
       <header className={styles.header}>
@@ -99,8 +119,8 @@ export default function IoTControl() {
           {messages.length === 0 && (
             <div className={styles.emptyState}>
               <p>Menunggu instruksi...</p>
-              <p>Ketik <strong>"plase on"</strong> untuk MENGHIDUPKAN perangkat IOT.</p>
-              <p>Ketik <strong>"plase off"</strong> untuk MEMATIKAN perangkat IOT.</p>
+              <p>Ketik <strong>&quot;plase on&quot;</strong> untuk MENGHIDUPKAN perangkat IOT.</p>
+              <p>Ketik <strong>&quot;plase off&quot;</strong> untuk MEMATIKAN perangkat IOT.</p>
             </div>
           )}
           {messages.map((msg, i) => (
